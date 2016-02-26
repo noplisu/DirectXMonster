@@ -1,28 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace MonsterTextured
 {
     static class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
             using (Form1 frm = new Form1())
             {
-                if (!frm.InitializeDirect3D())
+                if (!frm.InitializeGraphics())
                 {
-                    MessageBox.Show("Error initizlizing Direct3D");
+                    MessageBox.Show("Could not initialize Direct3D.  This tutorial will exit.");
                     return;
                 }
                 frm.Show();
-                frm.Run();
+                while (frm.Created)
+                {
+                    frm.Render();
+                    Application.DoEvents();
+                }
             }
         }
     }
