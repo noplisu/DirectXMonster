@@ -38,17 +38,14 @@ namespace MonsterTextured
             if (device == null)
                 return;
 
-            // Clear the back buffer to a blue color (ARGB = 000000ff)
             device.Clear(ClearFlags.Target, System.Drawing.Color.Blue, 1.0f, 0);
-            // Begin the scene
             device.BeginScene();
+            SetupMatrices();
 
-            // New for Tutorial 2
             device.SetStreamSource(0, vertexBuffer, 0);
             device.VertexFormat = CustomVertex.TransformedColored.Format;
             device.DrawPrimitives(PrimitiveType.TriangleList, 0, 1);
 
-            // End the scene
             device.EndScene();
             device.Present();
         }
@@ -56,9 +53,7 @@ namespace MonsterTextured
         public void OnCreateDevice(object sender, EventArgs e)
         {
             Device dev = (Device)sender;
-            vertexBuffer = new VertexBuffer(
-                typeof(CustomVertex.TransformedColored), 3, dev, 0,
-                CustomVertex.TransformedColored.Format, Pool.Default);
+            vertexBuffer = new VertexBuffer(typeof(CustomVertex.TransformedColored), 3, dev, 0, CustomVertex.TransformedColored.Format, Pool.Default);
             vertexBuffer.Created += new System.EventHandler(this.OnCreateVertexBuffer);
             this.OnCreateVertexBuffer(vertexBuffer, null);
         }
@@ -80,6 +75,50 @@ namespace MonsterTextured
 
             stm.Write(verts);
             vb.Unlock();
+        }
+
+        private void SetupMatrices()
+        {
+            // For our world matrix, we will just rotate the object about the y-axis.
+
+            // Set up the rotation matrix to generate 1 full rotation (2*PI radians) 
+            // every 1000 ms. To avoid the loss of precision inherent in very high 
+            // floating point numbers, the system time is modulated by the rotation 
+            // period before conversion to a radian angle.
+            int iTime = Environment.TickCount % 1000;
+            float fAngle = iTime * (2.0f * (float)Math.PI) / 1000.0f;
+            device.Transform.World = Matrix.RotationY(fAngle);
+
+            // Set up our view matrix. A view matrix can be defined given an eye 
+            // point, a point to lookat, and a direction for which way is up. Here, 
+            // we set the eye five units back along the z-axis and up three units, 
+            // look at the origin, and define "up" to be in the y-direction.
+
+            device.Transform.View = Matrix.LookAtLH(
+                new Vector3(0.0f, 3.0f, -5.0f),
+                new Vector3(0.0f, 0.0f, 0.0f),
+                new Vector3(0.0f, 1.0f, 0.0f));
+
+            // For the projection matrix, we set up a perspective transform (which
+            // transforms geometry from 3D view space to 2D viewport space, with
+            // a perspective divide making objects smaller in the distance). To build
+            // a perpsective transform, we need the field of view (1/4 pi is common),
+            // the aspect ratio, and the near and far clipping planes (which define
+            // at what distances geometry should be no longer be rendered).
+            device.Transform.Projection = Matrix.PerspectiveFovLH(
+                (float)Math.PI / 4,
+                1.0f,
+                1.0f,
+                100.0f);
+        }
+
+        public void OnResetDevice(object sender, EventArgs e)
+        {
+            Device dev = (Device)sender;
+            // Turn off culling, so the user sees the front and back of the triangle
+            dev.RenderState.CullMode = Cull.None;
+            // Turn off Direct3D lighting, since object provides its own vertex colors
+            dev.RenderState.Lighting = false;
         }
     }
 }
