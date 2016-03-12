@@ -59,7 +59,7 @@ namespace MonsterTextured
                 // Turn on ambient lighting 
                 dev.RenderState.Ambient = System.Drawing.Color.White;
                 // Load the mesh from the specified file
-                mesh = Mesh.FromFile("tiger.x", MeshFlags.SystemMemory, device, out materials);
+                mesh = Mesh.FromFile("Monster.X", MeshFlags.SystemMemory, device, out materials);
 
                 if (meshTextures == null)
                 {
@@ -84,7 +84,7 @@ namespace MonsterTextured
                 // a point to lookat, and a direction for which way is up. Here, we set the
                 // eye five units back along the z-axis and up three units, look at the 
                 // origin, and define "up" to be in the y-direction.
-                device.Transform.View = Matrix.LookAtLH(new Vector3(0.0f, 3.0f, -5.0f),
+                device.Transform.View = Matrix.LookAtLH(new Vector3(0.0f, 3.0f, -150.0f),
                 new Vector3(0.0f, 0.0f, 0.0f),
                 new Vector3(0.0f, 1.0f, 0.0f));
                 // For the projection matrix, we set up a perspective transform (which
@@ -93,7 +93,7 @@ namespace MonsterTextured
                 // a perpsective transform, we need the field of view (1/4 pi is common),
                 // the aspect ratio, and the near and far clipping planes (which define at
                 // what distances geometry should be no longer be rendered).
-                device.Transform.Projection = Matrix.PerspectiveFovLH((float)(Math.PI / 4), 1.0f, 1.0f, 100.0f);
+                device.Transform.Projection = Matrix.PerspectiveFovLH((float)(Math.PI / 4), 1.0f, 1.0f, 1000.0f);
             }
             private void Render()
             {
